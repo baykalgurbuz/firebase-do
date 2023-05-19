@@ -3,7 +3,7 @@ import './App.css';
 import React ,{useState,useEffect}from 'react';
 import {AiOutlinePlus} from 'react-icons/ai';
 import Todo from './Todo';
-import {addDoc, collection, onSnapshot, query,updateDoc,doc } from 'firebase/firestore';
+import {addDoc, collection, onSnapshot, query,updateDoc,doc, deleteDoc } from 'firebase/firestore';
 import {db} from './firebase'
  
 
@@ -59,6 +59,10 @@ function App() {
     await updateDoc(doc(db,'todos',todo.id),{
       completed:!todo.completed
     })
+  };
+ //Delete todo
+  const deleteTodo =async (id)=>{
+    await deleteDoc(doc,(db,'todos',id))
   }
   
   return (
@@ -71,7 +75,7 @@ function App() {
       </form>
       <ul>
         {todos.map((todo,index)=> (
-      <Todo key={index} todo={todo} toggleComplete={toggleComplete}/>
+      <Todo key={index} todo={todo} toggleComplete={toggleComplete} deleteTodo={deleteTodo}/>
         ))}
 
       </ul>
