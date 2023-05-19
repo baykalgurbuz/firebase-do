@@ -3,7 +3,7 @@ import './App.css';
 import React ,{useState,useEffect}from 'react';
 import {AiOutlinePlus} from 'react-icons/ai';
 import Todo from './Todo';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { collection, onSnapshot, query,updateDoc,doc } from 'firebase/firestore';
 import {db} from './firebase'
  
 
@@ -32,6 +32,12 @@ function App() {
     return ()=>unsubscribe()
   },[])
   
+
+  const toggleComplete =async (todo) =>{
+    await updateDoc(doc(db,'todos',todo.id),{
+      completed:!todo.completed
+    })
+  }
   
   return (
     <div className={style.bg}>
@@ -43,7 +49,7 @@ function App() {
       </form>
       <ul>
         {todos.map((todo,index)=> (
-      <Todo key={index} todo={todo}/>
+      <Todo key={index} todo={todo} toggleComplete={toggleComplete}/>
         ))}
 
       </ul>
