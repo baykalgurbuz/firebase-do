@@ -3,7 +3,7 @@ import './App.css';
 import React ,{useState,useEffect}from 'react';
 import {AiOutlinePlus} from 'react-icons/ai';
 import Todo from './Todo';
-import { collection, onSnapshot, query,updateDoc,doc } from 'firebase/firestore';
+import {addDoc, collection, onSnapshot, query,updateDoc,doc } from 'firebase/firestore';
 import {db} from './firebase'
  
 
@@ -18,8 +18,30 @@ const style={
 
 }
 function App() {
-  const [todos,setTodos]=useState([])
-  
+  const [todos,setTodos]=useState([]) 
+  const [input,setInput] =useState('');
+  console.log(input)
+  //Create todo
+
+  const createTodo=async (e) =>{
+    e.preventDefault(e);
+    if (input === '')
+    {
+      alert('Pls enter valid todo ')
+      return
+    }
+      
+    
+    await addDoc(collection(db,'todos'),{
+      text :input,
+      completed :false,
+    })
+ 
+    setInput('')
+  };
+
+
+  //Read todo from firebase
   useEffect(()=>{
     const q =query(collection(db,'todos'))
     const unsubscribe=onSnapshot(q,(querySnapshot)=>{
@@ -32,7 +54,7 @@ function App() {
     return ()=>unsubscribe()
   },[])
   
-
+//Upadte todo in firebase
   const toggleComplete =async (todo) =>{
     await updateDoc(doc(db,'todos',todo.id),{
       completed:!todo.completed
@@ -43,8 +65,8 @@ function App() {
     <div className={style.bg}>
      <div className={style.container}>
       <h3 className={style.heading}>Todo App</h3>
-      <form className={style.form}>
-        <input className={style.input} type="text" placeholder='Add Todo'/>
+      <form onSubmit={createTodo} className={style.form}>
+        <input value={input} onChange={(e)=>setInput(e.target.value)} className={style.input} type="text" placeholder='Add Todo'/>
         <button className={style.button}><AiOutlinePlus size={30}></AiOutlinePlus></button>
       </form>
       <ul>
@@ -53,7 +75,7 @@ function App() {
         ))}
 
       </ul>
-      <p className={style.count}>You have 2 todos</p>
+      {todos.length < 1 ? null : ( <p className={style.count}>{`You have ${todos.length} todos`}</p>)}
      </div>
     </div>
   );
